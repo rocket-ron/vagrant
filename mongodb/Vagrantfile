@@ -15,14 +15,12 @@ Vagrant.configure(2) do |config|
   # boxes at https://atlas.hashicorp.com/search.
 
   config.vm.define :node1 do |node1|
-
-#    node1.vm.box = "azure"
-
+    node1.vm.box = "azure"
     node1.vm.boot_timeout = 1000
     node1.nfs.functional = false
 
     node1.vm.provider :azure do |azure|
-      node1.vm.box = "azure"
+
       node1.vm.boot_timeout = 1000
       node1.nfs.functional = false
 
@@ -31,9 +29,8 @@ Vagrant.configure(2) do |config|
       azure.subscription_id = '651f1b6f-d652-4c9f-b1ba-3533acc3204a'
       azure.storage_acct_name = 'mckrhcea01storage01' # optional. A new one will be generated if not provided.
 
-#      azure.vm_image = '0b11de9248dd4d87b18621318e037d37__RightImage-CentOS-6.5-x64-v14.1.5.1'
       azure.vm_image = '5112500ae3b842c8b9c604889f8753c3__OpenLogic-CentOS-65-20150605'
-#      azure.vm_image = 'b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_10-amd64-server-20150612-en-us-30GB'
+
       azure.vm_user = 'rcordell'
         azure.ssh_private_key_file = File.expand_path('~/.ssh/id_rsa')  # This is my private SSH key
         azure.ssh_certificate_file = File.expand_path('~/.ssh/ssh-cert.pem')  # This is the X509 certificate file generated from my private SSH key
@@ -46,7 +43,7 @@ Vagrant.configure(2) do |config|
       # Provide the following values if creating a *Nix VM
       azure.ssh_port = '2202'
       config.ssh.pty = true  # corrects for the sudo requiring a tty on Centos distros
-      config.vm.provision :shell, :path => File.expand_path('~/Development/puppet/puppet-bootstrap/centos_6_x.sh')
+
     end  #azure
 
     config.ssh.username = 'rcordell' # the one used to create the VM
@@ -55,25 +52,41 @@ Vagrant.configure(2) do |config|
   end  #node1
 
   config.vm.define :node2 do |node2|
-
     node2.vm.box = "puppetlabs/centos-6.6-64-puppet"
-
+    node2.vm.box_url = 'puppetlabs/centos-6.6-64-nocm'
     node2.vm.provider "vmware_fusion" do |v|
       v.vmx["memsize"] = "2048"
       v.vmx["numvcpus"] = "2"
-
-      config.vm.provision :shell, :path => File.expand_path('~/Development/puppet/puppet-bootstrap/centos_6_x.sh')
       config.vm.provision "shell", inline: $fix_vmware_tools_script
     end  # vmware_fusion
   end  #node2
+
+  config.vm.define :node3 do |node3|
+    node3.vm.box = "dummy"
+    node3.vm.box_url = 'https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box'
+    node3.vm.provider :aws do |aws, override|
+      override.nfs.functional = false
+      aws.access_key_id = ENV['AWS_ACCESS_KEY_ID']
+      aws.secret_access_key = ENV['AWS_SECRET_ACCESS_KEY']
+      aws.keypair_name = ENV['AWS_KEYPAIR_NAME']
+      aws.ami = "ami-777f9b33"
+      aws.region = "us-west-1"
+      aws.instance_type = "t2.medium"
+      override.ssh.username = "ec2-user"
+      override.ssh.private_key_path = ENV['PRIVATE_AWS_SSH_KEY_PATH']
+      aws.security_groups = ['vagrant']
+      aws.block_device_mapping = [{ 'DeviceName' => '/dev/sda1', 'Ebs.VolumeSize' => 60 }]
+    end  #aws
+  end  #node3
+
+
+  config.vm.provision :shell, :path => File.expand_path('~/Development/puppet/puppet-bootstrap/centos_6_x.sh')
 
   config.vm.provision :puppet do |puppet|
     puppet.manifests_path = "./manifests"
     puppet.module_path = File.expand_path("~/Development/puppet/modules")
     puppet.options = ['--verbose']
   end
-
-
 
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
