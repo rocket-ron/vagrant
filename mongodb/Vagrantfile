@@ -1,0 +1,85 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$fix_vmware_tools_script = <<SCRIPT
+sed -i.bak 's/answer AUTO_KMODS_ENABLED_ANSWER no/answer AUTO_KMODS_ENABLED_ANSWER yes/g' /etc/vmware-tools/locations
+sed -i.bak 's/answer AUTO_KMODS_ENABLED no/answer AUTO_KMODS_ENABLED yes/g' /etc/vmware-tools/locations
+SCRIPT
+
+Vagrant.configure(2) do |config|
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
+
+  # Every Vagrant development environment requires a box. You can search for
+  # boxes at https://atlas.hashicorp.com/search.
+
+  config.vm.define :node1 do |node1|
+
+#    node1.vm.box = "azure"
+
+    node1.vm.boot_timeout = 1000
+    node1.nfs.functional = false
+
+    node1.vm.provider :azure do |azure|
+      node1.vm.box = "azure"
+      node1.vm.boot_timeout = 1000
+      node1.nfs.functional = false
+
+      azure.mgmt_certificate = File.expand_path('./ronmckea01.pem')
+      azure.mgmt_endpoint = 'https://management.core.windows.net'
+      azure.subscription_id = '651f1b6f-d652-4c9f-b1ba-3533acc3204a'
+      azure.storage_acct_name = 'mckrhcea01storage01' # optional. A new one will be generated if not provided.
+
+#      azure.vm_image = '0b11de9248dd4d87b18621318e037d37__RightImage-CentOS-6.5-x64-v14.1.5.1'
+      azure.vm_image = '5112500ae3b842c8b9c604889f8753c3__OpenLogic-CentOS-65-20150605'
+#      azure.vm_image = 'b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_10-amd64-server-20150612-en-us-30GB'
+      azure.vm_user = 'rcordell'
+        azure.ssh_private_key_file = File.expand_path('~/.ssh/id_rsa')  # This is my private SSH key
+        azure.ssh_certificate_file = File.expand_path('~/.ssh/ssh-cert.pem')  # This is the X509 certificate file generated from my private SSH key
+
+      azure.vm_name = 'mongo-aznode1' # max 15 characters. contains letters, number and hyphens. can start with letters and can end with letters and numbers
+      azure.cloud_service_name = 'rhcmckea01-mongo-aznodes-01' # same as vm_name. leave blank to auto-generate
+#      azure.deployment_name = '' # defaults to cloud_service_name
+      azure.vm_location = 'West US' # e.g., West US
+
+      # Provide the following values if creating a *Nix VM
+      azure.ssh_port = '2202'
+      config.ssh.pty = true  # corrects for the sudo requiring a tty on Centos distros
+      config.vm.provision :shell, :path => File.expand_path('~/Development/puppet/puppet-bootstrap/centos_6_x.sh')
+    end  #azure
+
+    config.ssh.username = 'rcordell' # the one used to create the VM
+    config.ssh.private_key_path = File.expand_path('~/.ssh/id_rsa') # this is my private SSH to use instead of the Vagrant insecure key
+
+  end  #node1
+
+  config.vm.define :node2 do |node2|
+
+    node2.vm.box = "puppetlabs/centos-6.6-64-puppet"
+
+    node2.vm.provider "vmware_fusion" do |v|
+      v.vmx["memsize"] = "2048"
+      v.vmx["numvcpus"] = "2"
+
+      config.vm.provision :shell, :path => File.expand_path('~/Development/puppet/puppet-bootstrap/centos_6_x.sh')
+      config.vm.provision "shell", inline: $fix_vmware_tools_script
+    end  # vmware_fusion
+  end  #node2
+
+  config.vm.provision :puppet do |puppet|
+    puppet.manifests_path = "./manifests"
+    puppet.module_path = File.expand_path("~/Development/puppet/modules")
+    puppet.options = ['--verbose']
+  end
+
+
+
+  # Enable provisioning with a shell script. Additional provisioners such as
+  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
+  # documentation for more information about their specific syntax and use.
+  # config.vm.provision "shell", inline: <<-SHELL
+  #   sudo apt-get update
+  #   sudo apt-get install -y apache2
+  # SHELL
+end
