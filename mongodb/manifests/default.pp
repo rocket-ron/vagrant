@@ -77,6 +77,28 @@ class user-creation {
   }
 }
 
+class my_fw::pre {
+  Firewall {
+    require => undef,
+  }
+
+  firewall { '100 accept traffic on mongoDB port 27017':
+    port    => 27017,
+    proto   => 'tcp',
+    action  => 'accept',
+  }
+}
+
+resources { 'firewall':
+  purge => false,
+}
+
+Firewall {
+  require => Class['my_fw::pre'],
+}
+
+
+include my_fw::pre
 
 include install-git
 include epel-release
