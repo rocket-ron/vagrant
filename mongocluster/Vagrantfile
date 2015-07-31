@@ -15,7 +15,7 @@ Vagrant.configure(2) do |config|
       override.vm.box_url = 'puppetlabs/centos-6.6-64-nocm'
       v.vmx["memsize"] = "2048"
       v.vmx["numvcpus"] = "1"
-      config.vm.provision "shell", inline: $fix_vmware_tools_script
+#      config.vm.provision :shell, inline: $fix_vmware_tools_script
       config.vm.network :private_network, ip: '192.168.100.10'
     end  # vmware_fusion
 
@@ -31,7 +31,7 @@ Vagrant.configure(2) do |config|
       aws.instance_type = "t2.medium"
       override.ssh.username = "ec2-user"
       override.ssh.private_key_path = ENV['PRIVATE_AWS_SSH_KEY_PATH']
-      aws.security_groups = ['mongodb']
+      aws.security_groups = ['sg-858d03e0']
       aws.block_device_mapping = [{ 'DeviceName' => '/dev/sda1', 'Ebs.VolumeSize' => 60 }]
       aws.subnet_id = 'subnet-55e8f937'
       aws.private_ip_address = '172.31.16.10'
@@ -45,8 +45,7 @@ Vagrant.configure(2) do |config|
       override.vm.box_url = 'puppetlabs/centos-6.6-64-nocm'
       v.vmx["memsize"] = "2048"
       v.vmx["numvcpus"] = "1"
-      config.vm.provision "shell", inline: $fix_vmware_tools_script
-      config.vm.hostname = "repnode2"
+#      config.vm.provision :shell, inline: $fix_vmware_tools_script
       config.vm.network :private_network, ip: '192.168.100.11'
     end  # vmware_fusion#
     rep2.vm.provider :aws do |aws, override|
@@ -61,10 +60,69 @@ Vagrant.configure(2) do |config|
       aws.instance_type = "t2.medium"
       override.ssh.username = "ec2-user"
       override.ssh.private_key_path = ENV['PRIVATE_AWS_SSH_KEY_PATH']
-      aws.security_groups = ['mongodb']
+      aws.security_groups = ['sg-858d03e0']
       aws.block_device_mapping = [{ 'DeviceName' => '/dev/sda1', 'Ebs.VolumeSize' => 60 }]
       aws.subnet_id = 'subnet-55e8f937'
       aws.private_ip_address = '172.31.16.11'
+
+    end #aws
+  end  #rep2
+
+ config.vm.define :rep3 do |rep3|
+    rep3.vm.provider :vmware_fusion do |v, override|
+      override.vm.box = "puppetlabs/centos-6.6-64-puppet"
+      override.vm.box_url = 'puppetlabs/centos-6.6-64-nocm'
+      v.vmx["memsize"] = "2048"
+      v.vmx["numvcpus"] = "1"
+#      config.vm.provision :shell, inline: $fix_vmware_tools_script
+      config.vm.network :private_network, ip: '192.168.100.10'
+    end  # vmware_fusion
+
+    rep3.vm.provider :aws do |aws, override|
+      override.vm.box = "dummy"
+      override.vm.box_url = 'https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box'
+      override.nfs.functional = false
+      aws.access_key_id = ENV['AWS_ACCESS_KEY_ID']
+      aws.secret_access_key = ENV['AWS_SECRET_ACCESS_KEY']
+      aws.keypair_name = ENV['AWS_KEYPAIR_NAME']
+      aws.ami = "ami-777f9b33"
+      aws.region = "us-west-1"
+      aws.instance_type = "t2.medium"
+      override.ssh.username = "ec2-user"
+      override.ssh.private_key_path = ENV['PRIVATE_AWS_SSH_KEY_PATH']
+      aws.security_groups = ['sg-858d03e0']
+      aws.block_device_mapping = [{ 'DeviceName' => '/dev/sda1', 'Ebs.VolumeSize' => 60 }]
+      aws.subnet_id = 'subnet-55e8f937'
+      aws.private_ip_address = '172.31.16.20'
+    end #aws
+  end  #rep1
+
+  config.vm.define :rep4 do |rep4|
+
+    rep4.vm.provider "vmware_fusion" do |v, override|
+      override.vm.box = "puppetlabs/centos-6.6-64-puppet"
+      override.vm.box_url = 'puppetlabs/centos-6.6-64-nocm'
+      v.vmx["memsize"] = "2048"
+      v.vmx["numvcpus"] = "1"
+#      config.vm.provision :shell, inline: $fix_vmware_tools_script
+      config.vm.network :private_network, ip: '192.168.100.11'
+    end  # vmware_fusion#
+    rep4.vm.provider :aws do |aws, override|
+      override.vm.box = "dummy"
+      override.vm.box_url = 'https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box'
+      override.nfs.functional = false
+      aws.access_key_id = ENV['AWS_ACCESS_KEY_ID']
+      aws.secret_access_key = ENV['AWS_SECRET_ACCESS_KEY']
+      aws.keypair_name = ENV['AWS_KEYPAIR_NAME']
+      aws.ami = "ami-777f9b33"
+      aws.region = "us-west-1"
+      aws.instance_type = "t2.medium"
+      override.ssh.username = "ec2-user"
+      override.ssh.private_key_path = ENV['PRIVATE_AWS_SSH_KEY_PATH']
+      aws.security_groups = ['sg-858d03e0']
+      aws.block_device_mapping = [{ 'DeviceName' => '/dev/sda1', 'Ebs.VolumeSize' => 60 }]
+      aws.subnet_id = 'subnet-55e8f937'
+      aws.private_ip_address = '172.31.16.21'
 
     end #aws
   end  #rep2
