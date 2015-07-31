@@ -57,15 +57,9 @@ class {'::mongodb::globals':
 class {'::mongodb::server':
   verbose => true,
   bind_ip => ['0.0.0.0'],
-  replset => 'rs1',
   require => Class["system-update"],
 }->
 class {'::mongodb::client':}
-
-mongodb_replset { rs1:
-  ensure    => present,
-  members   => ['172.31.16.10:27017','172.31.16.11:27017'],
-}
 
 class user-creation {
   user { "rcordell":
