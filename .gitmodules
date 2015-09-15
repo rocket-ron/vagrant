@@ -1,0 +1,27 @@
+[submodule "salt-vagrant-demo"]
+	path = salt-vagrant-demo
+	url = https://github.com/UtahDave/salt-vagrant-demo.git
+[submodule "rmqcluster/puppet/modules/erlang"]
+	path = rmqcluster/puppet/modules/erlang
+	url = https://github.com/garethr/garethr-erlang.git
+[submodule "rmqcluster/puppet/modules/stdlib"]
+	path = rmqcluster/puppet/modules/stdlib
+	url = https://github.com/puppetlabs/puppetlabs-stdlib.git
+[submodule "rmqcluster/puppet/modules/rabbitmq"]
+	path = rmqcluster/puppet/modules/rabbitmq
+	url = https://github.com/puppetlabs/puppetlabs-rabbitmq.git
+[submodule "rmqcluster/puppet/modules/firewall"]
+	path = rmqcluster/puppet/modules/firewall
+	url = https://github.com/puppetlabs/puppetlabs-firewall.git
+[submodule "rmqcluster/puppet/modules/wget"]
+	path = rmqcluster/puppet/modules/wget
+	url = https://github.com/maestrodev/puppet-wget.git
+[submodule "rmqcluster/puppet/modules/epel"]
+	path = rmqcluster/puppet/modules/epel
+	url = https://github.com/stahnma/puppet-module-epel.git
+[submodule "rmqcluster/puppet/modules/apt"]
+	path = rmqcluster/puppet/modules/apt
+	url = https://github.com/puppetlabs-operations/puppet-puppetlabs_apt.git
+[submodule "rmqcluster/puppet/modules/staging"]
+	path = rmqcluster/puppet/modules/staging
+	url = https://github.com/nanliu/puppet-staging.git

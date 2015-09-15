@@ -11,12 +11,13 @@ Vagrant.configure(2) do |config|
 
   config.vm.define :node1 do |node1|
     node1.vm.provider :vmware_fusion do |v, override|
-      override.vm.box = "puppetlabs/centos-6.6-64-puppet"
+      override.vm.box = "puppetlabs/centos-6.6-64-nocm"
       override.vm.box_url = 'puppetlabs/centos-6.6-64-nocm'
       v.vmx["memsize"] = "2048"
       v.vmx["numvcpus"] = "1"
-#      config.vm.provision :shell, inline: $fix_vmware_tools_script
-      config.vm.network :private_network, ip: '192.168.100.10'
+      config.vm.provision :shell, :inline => $fix_vmware_tools_script
+      config.vm.hostname = "node1.rmqnode.localdomain"
+#      config.vm.network :private_network, ip: '192.168.100.10'
     end  # vmware_fusion
 
     node1.vm.provider :aws do |aws, override|
@@ -59,7 +60,7 @@ Vagrant.configure(2) do |config|
       # Provide the following values if creating a *Nix VM
       azure.ssh_port = '22'
       config.ssh.pty = true  # corrects for the sudo requiring a tty on Centos distros
-      config.vm.provision :shell, :path => "../puppet/bootstrap/centos_6_x.sh"
+#      config.vm.provision :shell, :path => "../puppet/bootstrap/centos_6_x.sh"
     end  #azure
   end  #node1
 
@@ -114,7 +115,7 @@ Vagrant.configure(2) do |config|
       # Provide the following values if creating a *Nix VM
       azure.ssh_port = '22'
       config.ssh.pty = true  # corrects for the sudo requiring a tty on Centos distros
-      config.vm.provision :shell, :path => "../puppet/bootstrap/centos_6_x.sh"
+ #     config.vm.provision :shell, :path => "../puppet/bootstrap/centos_6_x.sh"
     end  #azure
   end  #node2
 
@@ -168,7 +169,7 @@ Vagrant.configure(2) do |config|
       # Provide the following values if creating a *Nix VM
       azure.ssh_port = '22'
       config.ssh.pty = true  # corrects for the sudo requiring a tty on Centos distros
-      config.vm.provision :shell, :path => "../puppet/bootstrap/centos_6_x.sh"
+ #     config.vm.provision :shell, :path => "../puppet/bootstrap/centos_6_x.sh"
     end  #azure
   end  #node3
 
@@ -223,16 +224,17 @@ Vagrant.configure(2) do |config|
       # Provide the following values if creating a *Nix VM
       azure.ssh_port = '22'
       config.ssh.pty = true  # corrects for the sudo requiring a tty on Centos distros
-      config.vm.provision :shell, :path => "../puppet/bootstrap/centos_6_x.sh"
+#      config.vm.provision :shell, :path => "../puppet/bootstrap/centos_6_x.sh"
     end  #azure
   end  #node4
 
   config.vm.provision :shell, :path => File.expand_path('~/Development/puppet/puppet-bootstrap/centos_6_x.sh')
 
   config.vm.provision :puppet do |puppet|
-    puppet.manifests_path = "./manifests"
-    puppet.module_path = File.expand_path("~/Development/puppet/modules")
-    puppet.options = ['--verbose']
+    puppet.manifests_path = "puppet/manifests"
+    puppet.manifest_file = "site.pp"
+    puppet.module_path = "puppet/modules"
+    puppet.options = ['--verbose --debug --modulepath /vagrant/puppet/modules']
   end
 
 end
