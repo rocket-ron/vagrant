@@ -25,3 +25,6 @@
 [submodule "rmqcluster/puppet/modules/staging"]
 	path = rmqcluster/puppet/modules/staging
 	url = https://github.com/nanliu/puppet-staging.git
+[submodule "rmqcluster/scripts/puppet-bootstrap"]
+	path = rmqcluster/scripts/puppet-bootstrap
+	url = https://github.com/rocket-ron/puppet-bootstrap.git
