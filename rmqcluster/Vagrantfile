@@ -9,18 +9,18 @@ SCRIPT
 
 Vagrant.configure(2) do |config|
 
-  config.vm.define :node1 do |node1|
-    node1.vm.provider :vmware_fusion do |v, override|
-      override.vm.box = "oracle-linux-65"
-      override.vm.box_url = '/Volumes/JetDrive%20350/oracle-linux-65'
+  config.vm.define :rmq01 do |rmq01|
+    rmq01.vm.provider :vmware_fusion do |v, override|
+      override.vm.box = "puppetlabs/centos-6.6-64-nocm"
+      override.vm.box_url = 'puppetlabs/centos-6.6-64-nocm'
       v.vmx["memsize"] = "2048"
       v.vmx["numvcpus"] = "1"
       config.vm.provision :shell, :inline => $fix_vmware_tools_script
-      config.vm.hostname = "node1.rmqnode.localdomain"
+      config.vm.hostname = "rmq01.rmqnode.localdomain"
 #      config.vm.network :private_network, ip: '192.168.100.10'
     end  # vmware_fusion
 
-    node1.vm.provider :aws do |aws, override|
+    rmq01.vm.provider :aws do |aws, override|
       override.vm.box = "dummy"
       override.vm.box_url = 'https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box'
       override.nfs.functional = false
@@ -38,7 +38,7 @@ Vagrant.configure(2) do |config|
       aws.private_ip_address = '172.31.16.10'
     end #aws
 
-    node1.vm.provider :azure do |azure, override|
+    rmq01.vm.provider :azure do |azure, override|
       override.vm.box = "azure"
       azure.mgmt_certificate = '/Users/rcordell/Documents/MIDS/W205/MIDS-W205/project/vagrant/azure/ronmckea01.pem'
       azure.mgmt_endpoint = 'https://management.core.windows.net'
@@ -62,11 +62,11 @@ Vagrant.configure(2) do |config|
       config.ssh.pty = true  # corrects for the sudo requiring a tty on Centos distros
 #      config.vm.provision :shell, :path => "../puppet/bootstrap/centos_6_x.sh"
     end  #azure
-  end  #node1
+  end  #rmq01
 
-  config.vm.define :node2 do |node2|
+  config.vm.define :rmq02 do |rmq02|
 
-    node2.vm.provider "vmware_fusion" do |v, override|
+    rmq02.vm.provider "vmware_fusion" do |v, override|
       override.vm.box = "puppetlabs/centos-6.6-64-puppet"
       override.vm.box_url = 'puppetlabs/centos-6.6-64-nocm'
       v.vmx["memsize"] = "2048"
@@ -74,7 +74,7 @@ Vagrant.configure(2) do |config|
 #      config.vm.provision :shell, inline: $fix_vmware_tools_script
       config.vm.network :private_network, ip: '192.168.100.11'
     end  # vmware_fusion#
-    node2.vm.provider :aws do |aws, override|
+    rmq02.vm.provider :aws do |aws, override|
       override.vm.box = "dummy"
       override.vm.box_url = 'https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box'
       override.nfs.functional = false
@@ -93,7 +93,7 @@ Vagrant.configure(2) do |config|
 
     end #aws
 
-    node2.vm.provider :azure do |azure, override|
+    rmq02.vm.provider :azure do |azure, override|
       override.vm.box = "azure"
       azure.mgmt_certificate = '/Users/rcordell/Documents/MIDS/W205/MIDS-W205/project/vagrant/azure/ronmckea01.pem'
       azure.mgmt_endpoint = 'https://management.core.windows.net'
@@ -117,10 +117,10 @@ Vagrant.configure(2) do |config|
       config.ssh.pty = true  # corrects for the sudo requiring a tty on Centos distros
  #     config.vm.provision :shell, :path => "../puppet/bootstrap/centos_6_x.sh"
     end  #azure
-  end  #node2
+  end  #rmq02
 
- config.vm.define :node3 do |node3|
-    node3.vm.provider :vmware_fusion do |v, override|
+ config.vm.define :rmq03 do |rmq03|
+    rmq03.vm.provider :vmware_fusion do |v, override|
       override.vm.box = "puppetlabs/centos-6.6-64-puppet"
       override.vm.box_url = 'puppetlabs/centos-6.6-64-nocm'
       v.vmx["memsize"] = "2048"
@@ -129,7 +129,7 @@ Vagrant.configure(2) do |config|
       config.vm.network :private_network, ip: '192.168.100.10'
     end  # vmware_fusion
 
-    node3.vm.provider :aws do |aws, override|
+    rmq03.vm.provider :aws do |aws, override|
       override.vm.box = "dummy"
       override.vm.box_url = 'https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box'
       override.nfs.functional = false
@@ -147,7 +147,7 @@ Vagrant.configure(2) do |config|
       aws.private_ip_address = '172.31.16.20'
     end #aws
 
-    node3.vm.provider :azure do |azure, override|
+    rmq03.vm.provider :azure do |azure, override|
       override.vm.box = "azure"
       azure.mgmt_certificate = '/Users/rcordell/Documents/MIDS/W205/MIDS-W205/project/vagrant/azure/ronmckea01.pem'
       azure.mgmt_endpoint = 'https://management.core.windows.net'
@@ -171,11 +171,11 @@ Vagrant.configure(2) do |config|
       config.ssh.pty = true  # corrects for the sudo requiring a tty on Centos distros
  #     config.vm.provision :shell, :path => "../puppet/bootstrap/centos_6_x.sh"
     end  #azure
-  end  #node3
+  end  #rmq03
 
-  config.vm.define :node4 do |node4|
+  config.vm.define :rmq04 do |rmq04|
 
-    node4.vm.provider "vmware_fusion" do |v, override|
+    rmq04.vm.provider "vmware_fusion" do |v, override|
       override.vm.box = "puppetlabs/centos-6.6-64-puppet"
       override.vm.box_url = 'puppetlabs/centos-6.6-64-nocm'
       v.vmx["memsize"] = "2048"
@@ -183,7 +183,7 @@ Vagrant.configure(2) do |config|
 #      config.vm.provision :shell, inline: $fix_vmware_tools_script
       config.vm.network :private_network, ip: '192.168.100.11'
     end  # vmware_fusion#
-    node4.vm.provider :aws do |aws, override|
+    rmq04.vm.provider :aws do |aws, override|
       override.vm.box = "dummy"
       override.vm.box_url = 'https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box'
       override.nfs.functional = false
@@ -202,7 +202,7 @@ Vagrant.configure(2) do |config|
 
     end #aws
 
-    node4.vm.provider :azure do |azure, override|
+    rmq04.vm.provider :azure do |azure, override|
       override.vm.box = "azure"
       azure.mgmt_certificate = '/Users/rcordell/Documents/MIDS/W205/MIDS-W205/project/vagrant/azure/ronmckea01.pem'
       azure.mgmt_endpoint = 'https://management.core.windows.net'
@@ -226,7 +226,7 @@ Vagrant.configure(2) do |config|
       config.ssh.pty = true  # corrects for the sudo requiring a tty on Centos distros
 #      config.vm.provision :shell, :path => "../puppet/bootstrap/centos_6_x.sh"
     end  #azure
-  end  #node4
+  end  #rmq04
 
   config.vm.provision :shell, :path => 'scripts/puppet-bootstrap/centos_6_x.sh'
 
