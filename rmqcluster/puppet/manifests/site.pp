@@ -1,6 +1,9 @@
 node 'rmq01.rmqnode.localdomain' {
   include ::role::rmqnode::server::vagrant
 }
+node 'rmq02.rmqnode.localdomain' {
+  include ::role::rmqnode::server::vagrant
+}
 
 class role {
   include ::profile::base 
