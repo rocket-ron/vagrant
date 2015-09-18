@@ -11,8 +11,8 @@ Vagrant.configure(2) do |config|
 
   config.vm.define :rmq01 do |rmq01|
     rmq01.vm.provider :vmware_fusion do |v, override|
-      override.vm.box = "puppetlabs/centos-6.6-64-nocm"
-      override.vm.box_url = 'puppetlabs/centos-6.6-64-nocm'
+      override.vm.box = "puppetlabs/ubuntu-14.04-64-puppet"
+      override.vm.box_url = 'puppetlabs/ubuntu-14.04-64-puppet'
       v.vmx["memsize"] = "2048"
       v.vmx["numvcpus"] = "1"
       config.vm.provision :shell, :inline => $fix_vmware_tools_script
@@ -40,17 +40,16 @@ Vagrant.configure(2) do |config|
 
     rmq01.vm.provider :azure do |azure, override|
       override.vm.box = "azure"
-      azure.mgmt_certificate = '/Users/rcordell/Documents/MIDS/W205/MIDS-W205/project/vagrant/azure/ronmckea01.pem'
+      override.nfs.functional = false
+#      override.ssh.pty = true
+      azure.mgmt_certificate = 'ronmckea01.pem'
       azure.mgmt_endpoint = 'https://management.core.windows.net'
       azure.subscription_id = '651f1b6f-d652-4c9f-b1ba-3533acc3204a'
       azure.storage_acct_name = 'mckrhcea01storage01' # optional. A new one will be generated if not provided.
 
-#      azure.vm_image = '0b11de9248dd4d87b18621318e037d37__RightImage-CentOS-6.5-x64-v14.1.5.1'
-      azure.vm_image = '5112500ae3b842c8b9c604889f8753c3__OpenLogic-CentOS-65-20150605'
-#      azure.vm_image = 'b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_10-amd64-server-20150612-en-us-30GB'
+      azure.vm_image = 'b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_3-LTS-amd64-server-20150908-en-us-30GB'
       azure.vm_user = 'rcordell'
       azure.ssh_private_key_file = File.expand_path('~/.ssh/id_rsa')  # This is my private SSH key
-      azure.ssh_certificate_file = File.expand_path('~/.ssh/ssh-cert.pem')  # This is the X509 certificate file generated from my private SSH key
 
       azure.vm_name = 'mckrhcea01-rmq1' # max 15 characters. contains letters, number and hyphens. can start with letters and can end with letters and numbers
       azure.cloud_service_name = 'mckrhcea01-rmq1' # same as vm_name. leave blank to auto-generate
@@ -59,7 +58,7 @@ Vagrant.configure(2) do |config|
 
       # Provide the following values if creating a *Nix VM
       azure.ssh_port = '22'
-      config.ssh.pty = true  # corrects for the sudo requiring a tty on Centos distros
+
 #      config.vm.provision :shell, :path => "../puppet/bootstrap/centos_6_x.sh"
     end  #azure
   end  #rmq01
@@ -228,7 +227,10 @@ Vagrant.configure(2) do |config|
     end  #azure
   end  #rmq04
 
-  config.vm.provision :shell, :path => 'scripts/puppet-bootstrap/centos_6_x.sh'
+  config.ssh.username = 'rcordell'
+  config.ssh.private_key_path = File.expand_path('~/.ssh/id_rsa')
+  config.ssh.pty = true  # corrects for the sudo requiring a tty on Centos distros
+  config.vm.provision :shell, :path => 'scripts/puppet-bootstrap/ubuntu.sh'
 
   config.vm.provision :puppet do |puppet|
     puppet.manifests_path = "puppet/manifests"
