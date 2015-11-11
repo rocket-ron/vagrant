@@ -1,0 +1,133 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure(2) do |config|
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
+
+  # Every Vagrant development environment requires a box. You can search for
+  # boxes at https://atlas.hashicorp.com/search.
+
+  # Disable automatic box update checking. If you disable this, then
+  # boxes will only be checked for updates when the user runs
+  # `vagrant box outdated`. This is not recommended.
+  # config.vm.box_check_update = false
+
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine. In the example below,
+  # accessing "localhost:8080" will access port 80 on the guest machine.
+  # config.vm.network "forwarded_port", guest: 80, host: 8080
+
+  # Create a private network, which allows host-only access to the machine
+  # using a specific IP.
+  # config.vm.network "private_network", ip: "192.168.33.10"
+
+  # Create a public network, which generally matched to bridged network.
+  # Bridged networks make the machine appear as another physical device on
+  # your network.
+  # config.vm.network "public_network"
+
+  # Share an additional folder to the guest VM. The first argument is
+  # the path on the host to the actual folder. The second argument is
+  # the path on the guest to mount the folder. And the optional third
+  # argument is a set of non-required options.
+  # config.vm.synced_folder "../data", "/vagrant_data"
+
+  # Provider-specific configuration so you can fine-tune various
+  # backing providers for Vagrant. These expose provider-specific options.
+  # Example for VirtualBox:
+  #
+  # config.vm.provider "virtualbox" do |vb|
+  #   # Display the VirtualBox GUI when booting the machine
+  #   vb.gui = true
+  #
+  #   # Customize the amount of memory on the VM:
+  #   vb.memory = "1024"
+  # end
+  #
+  # View the documentation for the provider you are using for more
+  # information on available options.
+
+  sl_user_data_file = File.join(File.dirname(File.expand_path(__FILE__)), '.softlayer')
+  sl_user_data = JSON.parse(File.open(sl_user_data_file).read, :symbolize_names => true)
+
+  config.vm.provider :softlayer do |sl, config_override|
+    config_override.vm.box		    = 'softlayer'
+    config_override.ssh.username	= 'root'
+    config_override.ssh.private_key_path    = [ File.expand_path("~/.ssh/id_rsa")]
+
+    config_override.nfs.functional = false
+
+    #sl.api_key                   = ENV["SL_API_KEY"]
+    #sl.api_timeout               = 60
+    #sl.datacenter                = "sjc03"
+    #sl.dedicated                 = false
+    sl.disk_capacity             = { 0 => 25 } # { disk_num => capacity_gb }, disk 1 reserved for swap by SoftLayer dont use
+    sl.domain                    = 'rlcw251.net'
+    #sl.endpoint_url              = SoftLayer::API_PUBLIC_ENDPOINT
+    #sl.force_private_ip          = false
+    sl.hostname                  = 'vagrant'
+    sl.hourly_billing            = true
+    #sl.image_guid                = "AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE" #Dont use this with sl.operating_system/sl.disk_capacity, they are mutually exclusive
+    #sl.local_disk                = false
+    #sl.manage_dns                = false
+    sl.max_memory                = 4096
+    #sl.network_speed             = 10
+    sl.operating_system          = "CENTOS_LATEST_64" 
+    #sl.post_install              = nil #URL for post install script
+    #sl.private_only              = false
+    #sl.provision_timeout         = 1200
+    #sl.rebuild_timeout           = 1200
+    #sl.ssh_key                   = "rcordell"
+    sl.start_cpus                = 2
+    #sl.transaction_wait          = true
+    #sl.user_data                 = nil
+    #sl.username                  = ENV["SL_API_USERNAME"] || ENV['USER'] || ENV['USERNAME']   
+    #sl.vlan_private              = nil #Automatically generated, override to vlan number string otherwise, see contrib/vagrant-softlayer-vlans tool for list of acceptable vlan values
+    #sl.vlan_public               = nil #Automatically generated, override to vlan number string otherwise
+
+    #Join a load balancer, see https://github.com/audiolize/vagrant-softlayer/wiki/Join-load-balancers for more options
+    #sl.join_load_balancer vip: "1.1.1.1", port: 443, method: "Round Robin", type: "TCP" do |service|
+      #service.destination_port = 443
+      #service.health_check = "Ping"
+      #service.weight = 2
+    #end
+
+    sl_user_data.each do |k,v|
+      sl.send("#{k}=", v)
+    end
+
+    #cci.vm.provision :file do |fileupload|
+    #  fileupload.source      = "/tmp/local_example.txt"
+    #  fileupload.destination = "/tmp/uploaded_vm_example.txt"
+    #end
+
+    #cci.vm.provision :shell do |shellscript|
+      #Use the id to override it somewhere else, and preserve_order ensures it gets executed at the point
+      #where it was originally defined instead of where it was overriden.
+    #  shellscript.inline = "/bin/echo -n 'hello_world' > /dev/null", id: "helloworld", preserve_order: true
+    #end
+  end		
+
+
+
+  # Define a Vagrant Push strategy for pushing to Atlas. Other push strategies
+  # such as FTP and Heroku are also available. See the documentation at
+  # https://docs.vagrantup.com/v2/push/atlas.html for more information.
+  # config.push.define "atlas" do |push|
+  #   push.app = "YOUR_ATLAS_USERNAME/YOUR_APPLICATION_NAME"
+  # end
+
+  # Enable provisioning with a shell script. Additional provisioners such as
+  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
+  # documentation for more information about their specific syntax and use.
+  # config.vm.provision "shell", inline: <<-SHELL
+  #   sudo apt-get update
+  #   sudo apt-get install -y apache2
+  # SHELL
+end
